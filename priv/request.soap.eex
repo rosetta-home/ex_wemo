@@ -1,0 +1,9 @@
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+  <s:Body>
+    <u:<%=action.name %> xmlns:u="<%=action.service_type %>" />
+      <%= Enum.map(action.arguments, fn {k, v} -> %>
+        <<%=k %>><%=v %></<%=k %>>
+      <% end) %>
+    </u:<%=action.name %>>
+  </s:Body>
+</s:Envelope>
