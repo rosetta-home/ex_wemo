@@ -2,38 +2,38 @@ defmodule WeMo.Client do
   use GenServer
   require Logger
 
+  defmodule State do
+    defstruct host_ip: {0, 0, 0, 0}
+  end
+
+  def start(host_ip), do: GenServer.call(__MODULE__, {:start, host_ip})
+
   def start_link() do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
   def init(:ok) do
-    SSDP.register()
-    {:ok, %{}}
+    {:ok, %State{}}
   end
 
   def handle_info({:device, %{device: %{device_type: 'urn:Belkin:device:insight:1'}} = d}, state) do
     Logger.info("Got Insight: #{inspect d.device}")
-    WeMo.DeviceSupervisor.start_device(d)
+    WeMo.InsightSupervisor.start_device(d, state.host_ip)
     {:noreply, state}
   end
+
   def handle_info({:device, %{device: %{device_type: 'urn:Belkin:device:lightswitch:1'}} = d}, state) do
     Logger.info("Got Lightswitch: #{inspect d.device}")
-    WeMo.DeviceSupervisor.start_device(d)
+    WeMo.LightSwitchSupervisor.start_device(d, state.host_ip)
     {:noreply, state}
   end
 
-  def handle_info({:device, other}, state) do
-    #Logger.info("Other Device: #{inspect other}")
+  def handle_info({:device, _other}, state) do
     {:noreply, state}
   end
 
-  def subscribe(device) do
-    headers = %{"CALLBACK" => "<http://192.168.1.112:8080>", "NT" => "upnp:event", "TIMEOUT" => "Second-600"}
-    device.device.service_list |> Enum.each(fn service ->
-      case HTTPoison.request(:subscribe, "#{device.uri.authority}#{service.event_sub_url}", "", headers) do
-        {:ok, resp} -> Logger.info("#{inspect resp}")
-        {:error, resp} -> Logger.error("#{inspect resp}")
-      end
-    end)
+  def handle_call({:start, host_ip}, _from, state) do
+    SSDP.register()
+    {:reply, :ok, %State{state | host_ip: host_ip}}
   end
 end

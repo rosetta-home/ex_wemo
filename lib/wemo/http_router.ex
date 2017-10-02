@@ -1,7 +1,7 @@
 defmodule WeMo.HTTPRouter do
 
   def start_link do
-    port = Application.get_env(:wemo, :http_port, 8080)
+    port = Application.get_env(:wemo, :http_port)
     dispatch = :cowboy_router.compile([
       { :_,
         [

@@ -7,11 +7,13 @@ defmodule WeMo.Application do
     children = [
       worker(WeMo.HTTPRouter, []),
       worker(WeMo.Client, []),
-      supervisor(WeMo.DeviceSupervisor, []),
+      supervisor(WeMo.InsightSupervisor, []),
+      supervisor(WeMo.LightSwitchSupervisor, []),
     ]
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: WeMo.Supervisor]
     Supervisor.start_link(children, opts)
   end
+
 end
