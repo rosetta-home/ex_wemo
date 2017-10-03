@@ -26,7 +26,7 @@ defmodule WeMo.Mixfile do
   defp deps do
     [
       {:ssdp, "~> 0.1"},
-      {:httpoison, "~> 0.13.0", override: true},
+      {:httpoison, "~> 0.11.1"},
       {:sweet_xml, "~> 0.6.5"},
       {:cowboy, "~> 1.0"},
       {:ex_doc, ">= 0.0.0", only: :dev}
