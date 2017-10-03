@@ -11,7 +11,6 @@ defmodule WeMo.EventHandler do
   def handle(req, state) do
     {:ok, body, req2} = :cowboy_req.body(req)
     {sid, req3} = :cowboy_req.header("sid", req2)
-    Logger.info("SID: #{sid}")
     element = body |> xpath(~x"//e:propertyset/e:property/*[1]"e) |> map_element
     @supervisors |> Enum.each(fn s ->
       s |> Supervisor.which_children |> Enum.each( fn {_i, pid, _t, _m} ->

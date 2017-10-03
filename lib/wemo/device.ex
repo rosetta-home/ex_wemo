@@ -110,11 +110,13 @@ defmodule WeMo.Device do
 
       defp send_action(%Action{} = action, address) do
         Task.start(fn ->
-          headers = %{"SOAPACTION" => "\"#{action.service_type}##{action.name}\"", "Content-Type" => "text/xml; charset=\"utf-8\"", "Accept" => ""}
+          headers = %{
+            "SOAPACTION" => "\"#{action.service_type}##{action.name}\"",
+            "Content-Type" => "text/xml; charset=\"utf-8\"",
+            "Accept" => "*/*",
+            "Connection" => "keep-alive"
+          }
           body = EEx.eval_file(@request_template, [action: action])
-          Logger.info "#{inspect "http://#{address}/upnp/control/basicevent1"}"
-          Logger.info "#{inspect headers}"
-          Logger.info "#{body}"
           case HTTPoison.post("http://#{address}/upnp/control/basicevent1", body, headers) do
             {:ok, %HTTPoison.Response{status_code: 200} = r} -> Logger.info("#{inspect r}")
             {:ok, %HTTPoison.Response{status_code: 500} = r} -> Logger.error("#{inspect r}")
