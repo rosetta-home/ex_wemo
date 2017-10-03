@@ -1,6 +1,7 @@
 defmodule WeMo.Client do
   use GenServer
   require Logger
+  alias WeMo.Util
 
   @http_port Application.get_env(:wemo, :http_port)
 
@@ -38,7 +39,7 @@ defmodule WeMo.Client do
     SSDP.register()
     host_ip =
       case host_ip do
-        nil -> get_ipv4_address()
+        nil -> Util.get_ipv4_address()
         host_ip -> host_ip
       end
     Logger.info "Using #{inspect host_ip}:#{@http_port} for local server"
@@ -49,22 +50,5 @@ defmodule WeMo.Client do
     Logger.debug "Registering: #{inspect pid}"
     Registry.register(WeMo.Registry, WeMo, pid)
     {:reply, :ok, state}
-  end
-
-  def get_ipv4_address() do
-    :inet.getifaddrs()
-    |> elem(1)
-    |> Enum.find(fn {_interface, attr} ->
-      Logger.debug("#{inspect attr}")
-      case attr |> Keyword.get(:addr) do
-        nil -> false
-        {127, 0, 0, 1} -> false
-        {_, _, _, _, _, _, _, _} -> false
-        {_, _, _, _} -> true
-      end
-    end)
-    |> elem(1)
-    |> Keyword.fetch(:addr)
-    |> elem(1)
   end
 end

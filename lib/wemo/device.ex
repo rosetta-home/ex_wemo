@@ -1,5 +1,7 @@
 defmodule WeMo.Device do
-  @callback handle_event(event :: String.t) :: {:ok, %{}}
+  alias WeMo.Util
+
+  @callback handle_event(event :: String.t) :: {:ok, %{}} | :ok
 
   defmacro __using__(_) do
     quote do
@@ -57,7 +59,7 @@ defmodule WeMo.Device do
           name: "SetBinaryState",
           service_type: "urn:Belkin:service:basicevent:1",
           arguments: [{"BinaryState", "1"}]
-        } |> send_action(state.device.uri.authority)
+        } |> send_action(state)
         {:noreply, state}
       end
 
@@ -66,7 +68,7 @@ defmodule WeMo.Device do
           name: "SetBinaryState",
           service_type: "urn:Belkin:service:basicevent:1",
           arguments: [{"BinaryState", "0"}]
-        } |> send_action(state.device.uri.authority)
+        } |> send_action(state)
         {:noreply, state}
       end
 
@@ -75,7 +77,7 @@ defmodule WeMo.Device do
           name: "GetPower",
           service_type: "urn:Belkin:service:insight:1",
           arguments: [{"InstantPower", "1"}]
-        } |> send_action(state.device.uri.authority)
+        } |> send_action(state)
         {:noreply, state}
       end
 
@@ -111,7 +113,7 @@ defmodule WeMo.Device do
         end)
       end
 
-      defp send_action(%Action{} = action, address) do
+      defp send_action(%Action{} = action, state) do
         WeMo.TaskSupervisor |> Task.Supervisor.start_child(fn ->
           headers = %{
             "SOAPACTION" => "\"#{action.service_type}##{action.name}\"",
@@ -120,10 +122,13 @@ defmodule WeMo.Device do
             "Connection" => "keep-alive"
           }
           body = EEx.eval_file(@request_template, [action: action])
-          case HTTPoison.post("http://#{address}/upnp/control/basicevent1", body, headers) do
-            {:ok, %HTTPoison.Response{status_code: 200} = r} -> Logger.debug("#{inspect r}")
+          case HTTPoison.post("http://#{state.device.uri.authority}/upnp/control/basicevent1", body, headers) do
+            {:ok, %HTTPoison.Response{status_code: 200} = r} ->
+              sid = state.sids |> List.first
+              event = r.body |> Util.parse_event()
+              state.pid |> GenServer.cast({:event, sid, event})
             {:ok, %HTTPoison.Response{status_code: 500} = r} -> Logger.error("#{inspect r}")
-            {:error, reason} -> Logger.error("#{reason}")
+            {:error, reason} -> Logger.error("#{inspect reason}")
           end
         end)
       end
@@ -133,9 +138,9 @@ defmodule WeMo.Device do
         {:ok, %{}}
       end
 
+      defp on_off?("8"), do: :on
       defp on_off?("1"), do: :on
       defp on_off?("0"), do: :off
-      defp on_off?(_), do: :off
 
       defoverridable [handle_event: 1]
     end

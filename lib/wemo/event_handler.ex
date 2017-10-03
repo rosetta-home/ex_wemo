@@ -1,6 +1,6 @@
 defmodule WeMo.EventHandler do
   require Logger
-  import SweetXml
+  alias WeMo.Util
 
   @supervisors [WeMo.InsightSupervisor, WeMo.LightSwitchSupervisor]
 
@@ -11,20 +11,13 @@ defmodule WeMo.EventHandler do
   def handle(req, state) do
     {:ok, body, req2} = :cowboy_req.body(req)
     {sid, req3} = :cowboy_req.header("sid", req2)
-    element = body |> xpath(~x"//e:propertyset/e:property/*[1]"e) |> map_element
+    element = body |> Util.parse_event
     @supervisors |> Enum.each(fn s ->
       s |> Supervisor.which_children |> Enum.each( fn {_i, pid, _t, _m} ->
         pid |> GenServer.cast({:event, sid, element})
       end)
     end)
     {:ok, req3, state}
-  end
-
-  defp map_element(element) do
-    %{
-      type: element |> elem(1),
-      value: element |> xpath(~x"./text()"s)
-    }
   end
 
   def terminate(_reason, _req, _state), do: :ok
