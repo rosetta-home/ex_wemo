@@ -42,16 +42,24 @@ defmodule WeMo.Device do
         {:noreply, %State{state | device: device, host_ip: host_ip}}
       end
 
+      def handle_cast({:event, nil, event}, state), do: do_handle_event(event, state)
       def handle_cast({:event, sid, event}, state) do
-        with true <- sid in state.sids,
-          {:ok, values} <- event |> __MODULE__.handle_event()
-        do
-          st = %State{state | values: values}
-          WeMo.dispatch(WeMo, {:device, st})
-          {:noreply, st}
-        else
-          _other -> {:noreply, state}
+        case sid in state.sids do
+          true -> do_handle_event(event, state)
+          _ -> {:noreply, state}
         end
+      end
+
+      def do_handle_event(event, state) do
+        state  =
+          case event |> __MODULE__.handle_event() do
+            {:ok, values} ->
+              state = %State{state | values: values}
+              WeMo.dispatch(WeMo, {:device, state})
+              state
+            _ -> state
+          end
+        {:noreply, state}
       end
 
       def handle_cast(:on, state) do
@@ -124,9 +132,7 @@ defmodule WeMo.Device do
           body = EEx.eval_file(@request_template, [action: action])
           case HTTPoison.post("http://#{state.device.uri.authority}/upnp/control/basicevent1", body, headers) do
             {:ok, %HTTPoison.Response{status_code: 200} = r} ->
-              sid = state.sids |> List.first
-              event = r.body |> Util.parse_event()
-              state.pid |> GenServer.cast({:event, sid, event})
+              state.pid |> GenServer.cast({:event, nil, r.body |> Util.parse_event()})
             {:ok, %HTTPoison.Response{status_code: 500} = r} -> Logger.error("#{inspect r}")
             {:error, reason} -> Logger.error("#{inspect reason}")
           end
