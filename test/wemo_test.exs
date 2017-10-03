@@ -1,8 +1,11 @@
 defmodule WemoTest do
   use ExUnit.Case
-  doctest Wemo
+  doctest WeMo
 
-  test "greets the world" do
-    assert Wemo.hello() == :world
+  test "test actual device on network" do
+    WeMo.Client.start()
+    WeMo.register()
+    SSDP.Client.start()
+    assert_receive {:device, %{device: %{}}}, 10_000
   end
 end

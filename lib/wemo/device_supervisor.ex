@@ -18,7 +18,6 @@ defmodule WeMo.DeviceSupervisor do
       end
 
       def start_device(device, host_ip) do
-        Logger.info "Starting device: #{inspect device}"
         case Supervisor.start_child(__MODULE__, [device, host_ip]) do
           {:ok, pid} -> :ok
           {:error, {:already_started, pid}} -> pid |> GenServer.cast({:device_update, device, host_ip})

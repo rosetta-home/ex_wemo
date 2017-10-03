@@ -2,7 +2,18 @@ defmodule WeMo.Device.Insight do
   use WeMo.Device
 
   defmodule Values do
-    defstruct [state: 0, last_changed_at: 0, last_on_for: 0, on_today: 0, on_total: 0, timespan: 0, average_power: 0, current_power: 0, energy_today: 0, energy_total: 0, standby_limit: 0]
+    defstruct [
+      state: :off,
+      last_changed_at: 0,
+      last_on_for: 0,
+      on_today: 0,
+      on_total: 0,
+      timespan: 0,
+      average_power: 0,
+      current_power: 0,
+      energy_today: 0,
+      energy_total: 0,
+      standby_limit: 0]
   end
 
   def handle_event(%{type: :InsightParams, value: value}) do
@@ -20,7 +31,7 @@ defmodule WeMo.Device.Insight do
       energy_total: etot |> String.to_integer,
       standby_limit: sl |> String.to_integer
     }
-    Logger.info "Got InsightParams: #{inspect values}"
+    Logger.debug "Got InsightParams: #{inspect values}"
     {:ok, values}
   end
 
@@ -38,27 +49,23 @@ defmodule WeMo.Device.Insight do
       energy_today: et |> String.to_integer,
       energy_total: etot |> String.to_integer,
     }
-    Logger.info "Got BinaryState: #{inspect values}"
+    Logger.debug "Got BinaryState: #{inspect values}"
     {:ok, values}
   end
 
   def handle_event(%{type: :EnergyPerUnitCost, value: value}) do
-    Logger.info "Got EnergyPerUnitCost: #{value}"
+    Logger.debug "Got EnergyPerUnitCost: #{value}"
   end
 
   def handle_event(%{type: :PluginParam, value: value}) do
-    Logger.info "Got PluginParam: #{value}"
+    Logger.debug "Got PluginParam: #{value}"
   end
 
   def handle_event(%{type: :HomeIdRequest, value: value}) do
-    Logger.info "Got HomeIdRequest: #{value}"
+    Logger.debug "Got HomeIdRequest: #{value}"
   end
 
   def handle_event(%{type: other, value: value}) do
     Logger.error "Got #{inspect other} type: #{value}"
   end
-
-  defp on_off?("1"), do: :on
-  defp on_off?("0"), do: :off
-  defp on_off?(_), do: :off
 end

@@ -1,18 +1,20 @@
 defmodule WeMo do
-  @moduledoc """
-  Documentation for Wemo.
-  """
+  require Logger
 
-  @doc """
-  Hello world.
+  def register do
+    WeMo.Client |> GenServer.call(:register)
+  end
 
-  ## Examples
-
-      iex> Wemo.hello
-      :world
-
-  """
-  def hello do
-    :world
+  def dispatch(type, event) do
+    Logger.debug "Dispatching: #{inspect type} - #{inspect event}"
+    case Registry.lookup(WeMo.Registry, type) do
+      [] -> Logger.debug "No Registrations for #{inspect type}"
+      _ ->
+        Registry.dispatch(WeMo.Registry, type, fn entries ->
+          for {_module, pid} <- entries, do: send(pid, event)
+        end)
+    end
+    Logger.debug "Dispatched: #{inspect event}"
+    event
   end
 end

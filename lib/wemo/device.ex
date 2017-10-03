@@ -14,7 +14,7 @@ defmodule WeMo.Device do
       end
 
       defmodule State do
-        defstruct device: %{}, sids: [], values: %{}, host_ip: {0, 0, 0, 0}
+        defstruct pid: nil, device: %{}, sids: [], values: %{}, host_ip: {0, 0, 0, 0}
       end
 
       def on(pid), do: GenServer.cast(pid, :on)
@@ -23,12 +23,13 @@ defmodule WeMo.Device do
       def insight(pid), do: GenServer.cast(pid, :insight)
 
       def start_link(device, host_ip) do
-        GenServer.start_link(__MODULE__, [device, host_ip], name: :"#{device.device.udn}")
+        pid = :"#{device.device.udn}"
+        GenServer.start_link(__MODULE__, [device, host_ip, pid], name: pid)
       end
 
-      def init([device, host_ip]) do
+      def init([device, host_ip, pid]) do
         Process.send_after(self(), :subscribe, 0)
-        {:ok, %State{device: device, host_ip: host_ip}}
+        {:ok, %State{device: device, host_ip: host_ip, pid: pid}}
       end
 
       def handle_call(:state, _from, state), do: {:reply, state, state}
@@ -43,7 +44,9 @@ defmodule WeMo.Device do
         with true <- sid in state.sids,
           {:ok, values} <- event |> __MODULE__.handle_event()
         do
-          {:noreply, %State{state | values: values}}
+          st = %State{state | values: values}
+          WeMo.dispatch(WeMo, {:device, st})
+          {:noreply, st}
         else
           _other -> {:noreply, state}
         end
@@ -86,15 +89,15 @@ defmodule WeMo.Device do
       defp subscribe(device, host_ip) do
         headers = %{"CALLBACK" => "<http://#{:inet.ntoa(host_ip)}:#{@http_port}>", "NT" => "upnp:event", "TIMEOUT" => "Second-600"}
         s = self()
-        Task.start(fn ->
+        WeMo.TaskSupervisor |> Task.Supervisor.start_child(fn ->
           sids =
             device.device.service_list |> Enum.map(fn service ->
               case HTTPoison.request(:subscribe, "#{device.uri.authority}#{service.event_sub_url}", "", headers) do
                 {:ok, resp} ->
-                  Logger.info "SUCCESS: #{service.event_sub_url}"
+                  Logger.info "#{device.device.udn} Event Subscription Successful: #{service.event_sub_url}"
                   (resp.headers |> Map.new)["SID"]
                 {:error, resp} ->
-                  Logger.error("#{service.event_sub_url}: #{inspect resp}")
+                  Logger.error("#{device.device.udn} Event Subscription failed #{service.event_sub_url}: #{inspect resp}")
                   nil
               end
             end)
@@ -109,7 +112,7 @@ defmodule WeMo.Device do
       end
 
       defp send_action(%Action{} = action, address) do
-        Task.start(fn ->
+        WeMo.TaskSupervisor |> Task.Supervisor.start_child(fn ->
           headers = %{
             "SOAPACTION" => "\"#{action.service_type}##{action.name}\"",
             "Content-Type" => "text/xml; charset=\"utf-8\"",
@@ -118,7 +121,7 @@ defmodule WeMo.Device do
           }
           body = EEx.eval_file(@request_template, [action: action])
           case HTTPoison.post("http://#{address}/upnp/control/basicevent1", body, headers) do
-            {:ok, %HTTPoison.Response{status_code: 200} = r} -> Logger.info("#{inspect r}")
+            {:ok, %HTTPoison.Response{status_code: 200} = r} -> Logger.debug("#{inspect r}")
             {:ok, %HTTPoison.Response{status_code: 500} = r} -> Logger.error("#{inspect r}")
             {:error, reason} -> Logger.error("#{reason}")
           end
@@ -126,9 +129,13 @@ defmodule WeMo.Device do
       end
 
       def handle_event(event) do
-        Logger.info("#{__MODULE__} received event: #{inspect event}")
+        Logger.debug("#{__MODULE__} received event: #{inspect event}")
         {:ok, %{}}
       end
+
+      defp on_off?("1"), do: :on
+      defp on_off?("0"), do: :off
+      defp on_off?(_), do: :off
 
       defoverridable [handle_event: 1]
     end

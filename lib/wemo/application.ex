@@ -5,10 +5,12 @@ defmodule WeMo.Application do
     import Supervisor.Spec, warn: false
     # List all child processes to be supervised
     children = [
-      worker(WeMo.HTTPRouter, []),
-      worker(WeMo.Client, []),
+      supervisor(Registry, [:duplicate, WeMo.Registry, []]),
+      supervisor(Task.Supervisor, [[name: WeMo.TaskSupervisor]]),
       supervisor(WeMo.InsightSupervisor, []),
       supervisor(WeMo.LightSwitchSupervisor, []),
+      worker(WeMo.HTTPRouter, []),
+      worker(WeMo.Client, []),
     ]
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
