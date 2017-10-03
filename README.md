@@ -12,12 +12,14 @@ Discover, monitor and control [Belkin WeMo](http://www.belkin.com/us/Products/ho
 ## Installation
 
     1. git clone https://github.com/NationalAssociationOfRealtors/wemo.git
-    2. mix do deps.get, deps.compile
-    3. iex -S mix
-    4. WeMo.Client.start(host_ip \\ nil)
-    5. WeMo.register()
-    6. SSDP.Client.start()
+    2. cd wemo
+    3. mix do deps.get, deps.compile
+    4. iex -S mix
+    5. WeMo.Client.start(host_ip \\ nil)
+    6. WeMo.register()
+    7. SSDP.Client.start()
 
+Alternatively you can install the package with hex `{:wemo, "~>0.1.0"}`
 
 ## Usage
 
