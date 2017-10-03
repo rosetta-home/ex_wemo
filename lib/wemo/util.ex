@@ -28,11 +28,16 @@ defmodule WeMo.Util do
     :inet.getifaddrs()
     |> elem(1)
     |> Enum.find(fn {_interface, attr} ->
-      case attr |> Keyword.get(:addr) do
-        nil -> false
-        {127, 0, 0, 1} -> false
-        {_, _, _, _, _, _, _, _} -> false
-        {_, _, _, _} -> true
+      case attr |> Keyword.get_values(:addr) do
+        [] -> false
+        list -> list |> Enum.find(fn(addr) ->
+          case addr do
+            nil -> false
+            {127, 0, 0, 1} -> false
+            {_, _, _, _, _, _, _, _} -> false
+            {_, _, _, _} -> true
+          end
+        end)
       end
     end)
     |> elem(1)
