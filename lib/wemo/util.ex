@@ -41,7 +41,14 @@ defmodule WeMo.Util do
       end
     end)
     |> elem(1)
-    |> Keyword.fetch(:addr)
-    |> elem(1)
+    |> Keyword.get_values(:addr)
+    |> Enum.find(fn addr ->
+      case addr do
+        nil -> false
+        {127, 0, 0, 1} -> false
+        {_, _, _, _, _, _, _, _} -> false
+        {_, _, _, _} -> true
+      end
+    end)
   end
 end
