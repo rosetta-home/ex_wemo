@@ -5,6 +5,7 @@ Discover, monitor and control [Belkin WeMo](http://www.belkin.com/us/Products/ho
 ## Supported Devices
   * LightSwitch
   * Insight
+  * Switch
   * More coming soon.
     * Or feel free to add your favorite.
     * Feel free to reach out if you need some help.
@@ -18,8 +19,6 @@ Discover, monitor and control [Belkin WeMo](http://www.belkin.com/us/Products/ho
     5. WeMo.Client.start(host_ip \\ nil)
     6. WeMo.register()
     7. SSDP.Client.start()
-
-Alternatively you can install the package with hex `{:wemo, "~>0.1.0"}`
 
 ## Usage
 

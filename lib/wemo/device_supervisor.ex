@@ -35,3 +35,7 @@ end
 defmodule WeMo.LightSwitchSupervisor do
   use WeMo.DeviceSupervisor, module: WeMo.Device.LightSwitch
 end
+
+defmodule WeMo.SwitchSupervisor do
+  use WeMo.DeviceSupervisor, module: WeMo.Device.Switch
+end

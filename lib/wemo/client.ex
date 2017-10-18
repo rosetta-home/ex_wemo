@@ -31,6 +31,12 @@ defmodule WeMo.Client do
     {:noreply, state}
   end
 
+  def handle_info({:device, %{device: %{device_type: 'urn:Belkin:device:controllee:1'}} = d}, state) do
+    Logger.info("Got Switch: #{inspect d.device}")
+    WeMo.SwitchSupervisor.start_device(d, state.host_ip)
+    {:noreply, state}
+  end
+
   def handle_info({:device, _other}, state) do
     {:noreply, state}
   end

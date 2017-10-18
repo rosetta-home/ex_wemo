@@ -9,6 +9,7 @@ defmodule WeMo.Application do
       supervisor(Task.Supervisor, [[name: WeMo.TaskSupervisor]]),
       supervisor(WeMo.InsightSupervisor, []),
       supervisor(WeMo.LightSwitchSupervisor, []),
+      supervisor(WeMo.SwitchSupervisor, []),
       worker(WeMo.HTTPRouter, []),
       worker(WeMo.Client, []),
     ]
