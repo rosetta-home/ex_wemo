@@ -39,3 +39,7 @@ end
 defmodule WeMo.SwitchSupervisor do
   use WeMo.DeviceSupervisor, module: WeMo.Device.Switch
 end
+
+defmodule WeMo.CoffeeMakerSupervisor do
+  use WeMo.DeviceSupervisor, module: WeMo.Device.CoffeeMaker
+end

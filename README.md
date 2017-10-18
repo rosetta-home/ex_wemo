@@ -6,6 +6,7 @@ Discover, monitor and control [Belkin WeMo](http://www.belkin.com/us/Products/ho
   * LightSwitch
   * Insight
   * Switch
+  * Coffee Maker
   * More coming soon.
     * Or feel free to add your favorite.
     * Feel free to reach out if you need some help.

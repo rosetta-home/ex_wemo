@@ -1,7 +1,7 @@
 defmodule WeMo.Device do
   alias WeMo.Util
 
-  @callback handle_event(event :: String.t) :: {:ok, %{}} | :ok
+  @callback handle_event(event :: String.t, %{}) :: {:ok, %{}} | :ok
 
   defmacro __using__(_) do
     quote do
@@ -12,7 +12,7 @@ defmodule WeMo.Device do
       @request_template Path.join(:code.priv_dir(:wemo), "request.soap.eex")
 
       defmodule Action do
-        defstruct name: nil, service_type: nil, arguments: []
+        defstruct name: nil, service_type: nil, arguments: [], path: "/upnp/control/basicevent1"
       end
 
       defmodule State do
@@ -52,7 +52,7 @@ defmodule WeMo.Device do
 
       def do_handle_event(event, state) do
         state  =
-          case event |> __MODULE__.handle_event() do
+          case event |> __MODULE__.handle_event(state.values) do
             {:ok, values} ->
               state = %State{state | values: values}
               WeMo.dispatch(WeMo, {:device, state})
@@ -130,7 +130,7 @@ defmodule WeMo.Device do
             "Connection" => "keep-alive"
           }
           body = EEx.eval_file(@request_template, [action: action])
-          case HTTPoison.post("http://#{state.device.uri.authority}/upnp/control/basicevent1", body, headers) do
+          case HTTPoison.post("http://#{state.device.uri.authority}#{action.path}", body, headers) do
             {:ok, %HTTPoison.Response{status_code: 200} = r} ->
               state.pid |> GenServer.cast({:event, nil, r.body |> Util.parse_event()})
             {:ok, %HTTPoison.Response{status_code: 500} = r} -> Logger.error("#{inspect r}")
@@ -148,7 +148,7 @@ defmodule WeMo.Device do
       defp on_off?("1"), do: :on
       defp on_off?("0"), do: :off
 
-      defoverridable [handle_event: 1]
+      defoverridable [handle_event: 1, on: 1, off: 1]
     end
   end
 end

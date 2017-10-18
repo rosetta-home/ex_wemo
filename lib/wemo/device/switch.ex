@@ -5,7 +5,7 @@ defmodule WeMo.Device.Switch do
     defstruct state: :off
   end
 
-  def handle_event(%{type: :BinaryState, value: value}) do
+  def handle_event(%{type: :BinaryState, value: value}, values) do
     [s] = value |> String.split("|")
     values = %Values{
       state: s |> on_off?
@@ -14,6 +14,6 @@ defmodule WeMo.Device.Switch do
     {:ok, values}
   end
 
-  def handle_event(%{type: other, value: value}), do: Logger.error "Got #{inspect other} type: #{value}"
+  def handle_event(%{type: other, value: value}, values), do: Logger.error "Got #{inspect other} type: #{value}"
 
 end

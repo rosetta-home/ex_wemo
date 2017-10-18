@@ -37,7 +37,14 @@ defmodule WeMo.Client do
     {:noreply, state}
   end
 
-  def handle_info({:device, _other}, state) do
+  def handle_info({:device, %{device: %{device_type: 'urn:Belkin:device:CoffeeMaker:1'}} = d}, state) do
+    Logger.info("Got Coffee Maker: #{inspect d.device}")
+    WeMo.CoffeeMakerSupervisor.start_device(d, state.host_ip)
+    {:noreply, state}
+  end
+
+  def handle_info({:device, d}, state) do
+    #Logger.info("Other: #{inspect d.device.device_type}")
     {:noreply, state}
   end
 

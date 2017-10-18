@@ -16,7 +16,7 @@ defmodule WeMo.Device.Insight do
       standby_limit: 0]
   end
 
-  def handle_event(%{type: :InsightParams, value: value}) do
+  def handle_event(%{type: :InsightParams, value: value}, values) do
     [s, lca, lof, ot, otot, ts, ap, cp, et, etot, sl] = value |> String.split("|")
     values = %Values{
       state: s |> on_off?,
@@ -35,7 +35,7 @@ defmodule WeMo.Device.Insight do
     {:ok, values}
   end
 
-  def handle_event(%{type: :BinaryState, value: value}) do
+  def handle_event(%{type: :BinaryState, value: value}, values) do
     [s, lca, lof, ot, otot, ts, ap, cp, et, etot] = value |> String.split("|")
     values = %Values{
       state: s |> on_off?,
@@ -53,19 +53,19 @@ defmodule WeMo.Device.Insight do
     {:ok, values}
   end
 
-  def handle_event(%{type: :EnergyPerUnitCost, value: value}) do
+  def handle_event(%{type: :EnergyPerUnitCost, value: value}, values) do
     Logger.debug "Got EnergyPerUnitCost: #{value}"
   end
 
-  def handle_event(%{type: :PluginParam, value: value}) do
+  def handle_event(%{type: :PluginParam, value: value}, values) do
     Logger.debug "Got PluginParam: #{value}"
   end
 
-  def handle_event(%{type: :HomeIdRequest, value: value}) do
+  def handle_event(%{type: :HomeIdRequest, value: value}, values) do
     Logger.debug "Got HomeIdRequest: #{value}"
   end
 
-  def handle_event(%{type: other, value: value}) do
+  def handle_event(%{type: other, value: value}, values) do
     Logger.error "Got #{inspect other} type: #{value}"
   end
 end
