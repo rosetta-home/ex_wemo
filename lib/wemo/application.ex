@@ -11,6 +11,7 @@ defmodule WeMo.Application do
       supervisor(WeMo.LightSwitchSupervisor, []),
       supervisor(WeMo.SwitchSupervisor, []),
       supervisor(WeMo.CoffeeMakerSupervisor, []),
+      supervisor(WeMo.HumidifierSupervisor, []),
       worker(WeMo.HTTPRouter, []),
       worker(WeMo.Client, []),
     ]

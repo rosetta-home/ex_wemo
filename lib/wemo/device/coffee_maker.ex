@@ -48,7 +48,7 @@ defmodule WeMo.Device.CoffeeMaker do
           prevalue: ~x"./prevalue/text()"i,
           ts: ~x"./ts/text()"i
         )
-        mode_val = atts |> get_attribute("Mode", Map.get(values, :mode_val))
+        mode_val = atts |> get_attribute("Mode", Map.get(values, :mode_val, 0))
         mode = @modes |> Enum.at(mode_val)
         mode_time = atts |> get_attribute("ModeTime", Map.get(values, :mode_time))
         {:ok, %Values{mode: mode, mode_time: mode_time, mode_val: mode_val}}

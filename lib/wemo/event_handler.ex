@@ -2,7 +2,7 @@ defmodule WeMo.EventHandler do
   require Logger
   alias WeMo.Util
 
-  @supervisors [WeMo.InsightSupervisor, WeMo.LightSwitchSupervisor, WeMo.CoffeeMakerSupervisor]
+  @supervisors [WeMo.InsightSupervisor, WeMo.LightSwitchSupervisor, WeMo.CoffeeMakerSupervisor, WeMo.HumidifierSupervisor]
 
   def init({:tcp, :http}, req, _opts) do
     {:ok, req, %{}}

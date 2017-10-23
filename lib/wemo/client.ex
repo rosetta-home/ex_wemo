@@ -43,6 +43,13 @@ defmodule WeMo.Client do
     {:noreply, state}
   end
 
+  def handle_info({:device, %{device: %{device_type: 'urn:Belkin:device:Humidifier:1'}} = d}, state) do
+    Logger.info("Got Humidifier: #{inspect d.device}")
+    WeMo.HumidifierSupervisor.start_device(d, state.host_ip)
+    {:noreply, state}
+  end
+
+
   def handle_info({:device, d}, state) do
     #Logger.info("Other: #{inspect d.device.device_type}")
     {:noreply, state}

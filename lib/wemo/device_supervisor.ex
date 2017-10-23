@@ -43,3 +43,7 @@ end
 defmodule WeMo.CoffeeMakerSupervisor do
   use WeMo.DeviceSupervisor, module: WeMo.Device.CoffeeMaker
 end
+
+defmodule WeMo.HumidifierSupervisor do
+  use WeMo.DeviceSupervisor, module: WeMo.Device.Humidifier
+end
