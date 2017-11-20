@@ -66,6 +66,6 @@ defmodule WeMo.Device.Insight do
   end
 
   def handle_event(%{type: other, value: value}, values) do
-    Logger.error "Got #{inspect other} type: #{value}"
+    Logger.error "Got #{inspect other} type: #{inspect value}"
   end
 end

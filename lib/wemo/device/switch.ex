@@ -14,6 +14,6 @@ defmodule WeMo.Device.Switch do
     {:ok, values}
   end
 
-  def handle_event(%{type: other, value: value}, values), do: Logger.error "Got #{inspect other} type: #{value}"
+  def handle_event(%{type: other, value: value}, values), do: Logger.error "Got #{inspect other} type: #{inspect value}"
 
 end

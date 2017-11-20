@@ -8,8 +8,8 @@ defmodule WeMo.Device do
       use GenServer
       require Logger
       @behaviour WeMo.Device
-      @http_port Application.get_env(:wemo, :http_port)
-      @request_template Path.join(:code.priv_dir(:wemo), "request.soap.eex")
+      @http_port Application.get_env(:ex_wemo, :http_port)
+      @request_template Path.join(:code.priv_dir(:ex_wemo), "request.soap.eex")
 
       defmodule Action do
         defstruct name: nil, service_type: nil, arguments: [], path: "/upnp/control/basicevent1"
@@ -26,6 +26,7 @@ defmodule WeMo.Device do
 
       def start_link(device, host_ip) do
         pid = :"#{device.device.udn}"
+        Logger.info("#{inspect pid}")
         GenServer.start_link(__MODULE__, [device, host_ip, pid], name: pid)
       end
 

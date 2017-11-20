@@ -17,7 +17,7 @@ defmodule WeMo.Mixfile do
   def application do
     [
       mod: {WeMo.Application, []},
-      env: [http_port: 8083],
+      env: [http_port: 8084],
       extra_applications: [:logger, :ssdp, :sweet_xml]
     ]
   end

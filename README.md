@@ -7,13 +7,14 @@ Discover, monitor and control [Belkin WeMo](http://www.belkin.com/us/Products/ho
   * Insight
   * Switch
   * Coffee Maker
+  * Humidifier
   * More coming soon.
     * Or feel free to add your favorite.
     * Feel free to reach out if you need some help.
 
 ## Installation
 
-    1. git clone https://github.com/NationalAssociationOfRealtors/wemo.git
+    1. git clone https://github.com/NationalAssociationOfRealtors/ex_wemo.git
     2. cd wemo
     3. mix do deps.get, deps.compile
     4. iex -S mix
@@ -25,7 +26,7 @@ Discover, monitor and control [Belkin WeMo](http://www.belkin.com/us/Products/ho
 
 `WeMo.Client.start` registers the WeMo library with the `SSDP.Registry`. You can pass `WeMo.Client.start` your IP address, or it will attempt to ascertain it by iterating over your network interfaces and using the first non-local ipv4 address it finds. The IP is for setting the `CALLBACK` url for the `SOAP` actions. Calling `WeMo.Client.start` allows you to wait for the network to be up, especially helpful when dealing with [Nerves](http://nerves-project.org) systems.
 
-The WeMo library runs a small cowboy server on port `8083` by default, this is overridable via `:wemo, :http_port`, for receiving subscription events from the devices. You should see some success and error messages if you ran the interactive terminal session in the installation section.
+The WeMo library runs a small cowboy server on port `8083` by default, this is overridable via `:ex_wemo, :http_port`, for receiving subscription events from the devices. You should see some success and error messages if you ran the interactive terminal session in the installation section.
 
 Calling `WeMo.register()`, registers your process with the `WeMo.Registry`. All events and action results are published over this registry. You can handle events using `handle_info({:device, device})` in the process that called `WeMo.register()`. Where device is the device state shown below.
 

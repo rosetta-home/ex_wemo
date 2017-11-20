@@ -68,7 +68,7 @@ defmodule WeMo.Device.Humidifier do
     end
   end
 
-  def handle_event(%{type: other, value: value}, values), do: Logger.error "Got #{inspect other} type: #{value}"
+  def handle_event(%{type: other, value: value}, values), do: Logger.error "Got #{inspect other} type: #{inspect value}"
 
   def get_attribute(atts, at, default \\ nil) do
     case atts |> Enum.find(fn a -> a.name == at end) do

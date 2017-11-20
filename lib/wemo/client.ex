@@ -3,7 +3,7 @@ defmodule WeMo.Client do
   require Logger
   alias WeMo.Util
 
-  @http_port Application.get_env(:wemo, :http_port)
+  @http_port Application.get_env(:ex_wemo, :http_port)
 
   defmodule State do
     defstruct host_ip: {0, 0, 0, 0}

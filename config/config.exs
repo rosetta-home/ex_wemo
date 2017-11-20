@@ -3,7 +3,7 @@
 use Mix.Config
 
 config :logger, level: :info
-config :ex_wemo, http_port: 8083
+config :ex_wemo, http_port: 8084
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
@@ -13,11 +13,11 @@ config :ex_wemo, http_port: 8083
 
 # You can configure your application as:
 #
-#     config :wemo, key: :value
+#     config :ex_wemo, key: :value
 #
 # and access this configuration in your application as:
 #
-#     Application.get_env(:wemo, :key)
+#     Application.get_env(:ex_wemo, :key)
 #
 # You can also configure a 3rd-party app:
 #
