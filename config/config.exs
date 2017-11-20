@@ -3,7 +3,7 @@
 use Mix.Config
 
 config :logger, level: :info
-config :wemo, http_port: 8083
+config :ex_wemo, http_port: 8083
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this

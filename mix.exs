@@ -3,7 +3,7 @@ defmodule WeMo.Mixfile do
 
   def project do
     [
-      app: :wemo,
+      app: :ex_wemo,
       version: "0.1.0",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
@@ -42,12 +42,12 @@ defmodule WeMo.Mixfile do
 
   def package do
     [
-      name: :wemo,
+      name: :ex_wemo,
       files: ["lib", "mix.exs", "priv", "README*", "LICENSE*"],
       maintainers: ["Christopher Steven Coté"],
       licenses: ["Apache License 2.0"],
-      links: %{"GitHub" => "https://github.com/NationalAssociationOfRealtors/wemo",
-          "Docs" => "https://github.com/NationalAssociationOfRealtors/wemo"}
+      links: %{"GitHub" => "https://github.com/NationalAssociationOfRealtors/ex_wemo",
+          "Docs" => "https://github.com/NationalAssociationOfRealtors/ex_wemo"}
     ]
   end
 end
